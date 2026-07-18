@@ -121,7 +121,7 @@ This project is open source and available under the MIT License (LICENSE).
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Groq Cloud for providing blazing fast, free AI inference.
 - Render & Netlify for reliable free hosting.
