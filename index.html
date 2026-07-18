@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yoda - Pixel AI Companion</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;700&family=Kaushan+Script&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        /* === CSS VARIABLES === */
+        :root {
+            --bg-primary: #FFFFFF;
+            --bg-secondary: #F4F4F9;
+            --accent-pink: #FF8E9E;
+            --accent-green: #8CE0C9;
+            --accent-purple: #B39DDB;
+            --text-main: #2D2D2D;
+            --text-muted: #777777;
+            --font-main: 'Karla', sans-serif;
+            --font-logo: 'Kaushan Script', cursive;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: var(--bg-primary); color: var(--text-main); font-family: var(--font-main); line-height: 1.6; }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-primary); }
+        ::-webkit-scrollbar-thumb { background: var(--accent-pink); border-radius: 10px; }
+
+        /* === REUSABLE COMPONENTS === */
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
+
+        .btn-retro {
+            background: var(--accent-pink); color: white; border: 3px solid var(--text-main);
+            padding: 0.8rem 2rem; font-family: var(--font-main); font-weight: 700; font-size: 1rem;
+            cursor: pointer; box-shadow: 4px 4px 0px 0px #D36C7C;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-transform: uppercase;
+        }
+        .btn-retro:hover { transform: translate(-2px, -2px); box-shadow: 6px 6px 0px 0px #D36C7C; }
+
+        /* === NAVBAR === */
+        #navbar {
+            position: sticky; top: 0; width: 100%; z-index: 1000;
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(8px);
+            border-bottom: 3px solid var(--text-main); padding: 1rem 2rem;
+        }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: var(--font-logo); font-size: 2.2rem; color: var(--text-main); text-decoration: none; letter-spacing: 1px; }
+        .nav-links { display: flex; list-style: none; gap: 2rem; align-items: center; }
+        .nav-links a { color: var(--text-main); text-decoration: none; font-weight: 700; padding: 0.5rem 1rem; border: 2px solid transparent; transition: 0.2s; }
+        .nav-links a:hover { border-color: var(--text-main); background: #f0f0f0; }
+        .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; }
+        .hamburger span { width: 25px; height: 3px; background: var(--text-main); }
+
+        /* === HERO === */
+        .hero { min-height: 90vh; display: flex; align-items: center; justify-content: center; padding: 4rem 2rem; }
+        .hero-grid { max-width: 1200px; width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; }
+        .hero-text { display: flex; flex-direction: column; gap: 1.5rem; }
+        .hero-text h1 { font-size: 4rem; letter-spacing: -2px; line-height: 1.1; }
+        .hero-text h1 span { color: var(--accent-pink); }
+        .hero-text p { font-size: 1.2rem; color: var(--text-muted); max-width: 500px; }
+        .hero-buttons { display: flex; gap: 1rem; }
+        
+        .mascot-container { width: 300px; height: 300px; position: relative; animation: floatMascot 4s ease-in-out infinite; }
+        .mascot-container img { width: 100%; height: auto; image-rendering: pixelated; }
+        @keyframes floatMascot { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
+
+        /* === POPULAR SEARCHES === */
+        #popular-searches { padding: 4rem 2rem; background: var(--bg-secondary); }
+        .section-header { text-align: center; margin-bottom: 3rem; }
+        .section-header h2 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .section-header p { color: var(--text-muted); }
+        .search-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem; }
+        .search-card {
+            background: var(--bg-primary); padding: 1.2rem; border: 3px solid var(--text-main);
+            text-align: center; cursor: pointer; transition: 0.2s; font-weight: 700;
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,0.1);
+        }
+        .search-card:hover { transform: translateY(-5px); border-color: var(--accent-green); box-shadow: 6px 6px 0px 0px var(--accent-green); }
+        .search-card i { margin-right: 8px; color: var(--accent-purple); }
+
+        /* === RETRO GAMES === */
+        #retro-games { padding: 4rem 2rem; background: var(--bg-primary); }
+        .games-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+        .game-card {
+            background: var(--bg-secondary); border: 4px solid var(--text-main);
+            padding: 2rem; text-align: center; box-shadow: 8px 8px 0px 0px var(--accent-pink);
+            transition: 0.2s; display: flex; flex-direction: column; align-items: center;
+        }
+        .game-card:hover { transform: translateY(-5px); }
+        .game-card h3 { margin: 1rem 0 0.5rem; }
+        .game-card p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1rem; }
+        
+        .game-board { display: grid; gap: 5px; margin: 10px 0; justify-content: center; }
+        .game-board.ttt { grid-template-columns: repeat(3, 60px); }
+        .game-board.memory { grid-template-columns: repeat(4, 60px); }
+        
+        .game-cell {
+            background: white; border: 2px solid var(--text-main); height: 60px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; font-weight: bold; cursor: pointer;
+            transition: 0.1s; box-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+        }
+        .game-cell:active { transform: scale(0.95); }
+        .game-cell.memory-card { font-size: 1.8rem; background: var(--accent-pink); color: white; }
+        .game-cell.memory-card.matched { background: var(--accent-green); cursor: default; }
+        
+        .game-controls { display: flex; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; justify-content: center; }
+        .btn-small { padding: 0.4rem 1rem; font-size: 0.8rem; }
+        
+        .rps-choices { display: flex; gap: 1rem; justify-content: center; margin: 1rem 0; }
+        .rps-btn { background: white; border: 3px solid var(--text-main); width: 60px; height: 60px; font-size: 2rem; cursor: pointer; transition: 0.2s; box-shadow: 2px 2px 0px rgba(0,0,0,0.1); }
+        .rps-btn:hover { transform: scale(1.1); background: var(--accent-green); }
+        .rps-score { display: flex; justify-content: center; gap: 2rem; font-weight: bold; margin-top: 1rem; }
+
+        /* === CHAT === */
+        #chat-interface { padding: 6rem 2rem; background: var(--bg-secondary); }
+        .chat-wrapper { max-width: 900px; margin: 0 auto; background: var(--bg-primary); border: 4px solid var(--text-main); overflow: hidden; box-shadow: 10px 10px 0px 0px var(--accent-pink); }
+        .chat-header { padding: 1rem 1.5rem; background: var(--accent-pink); border-bottom: 4px solid var(--text-main); display: flex; align-items: center; justify-content: space-between; }
+        .chat-header h3 { color: white; font-size: 1.2rem; font-weight: 700; }
+        .chat-header span { background: var(--bg-primary); padding: 0.2rem 0.8rem; border: 2px solid var(--text-main); font-size: 0.7rem; font-weight: bold; }
+        .chat-messages { height: 400px; padding: 1.5rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1.5rem; background: #fcfcfc; }
+        .message { display: flex; gap: 1rem; max-width: 85%; }
+        .message.user-message { align-self: flex-end; flex-direction: row-reverse; }
+        .message .bubble { padding: 1rem 1.5rem; border: 2px solid var(--text-main); background: var(--bg-primary); box-shadow: 3px 3px 0px 0px rgba(0,0,0,0.1); font-size: 0.95rem; }
+        .message.user-message .bubble { background: var(--accent-pink); border-color: var(--text-main); color: white; box-shadow: 3px 3px 0px 0px #D36C7C; }
+        .chat-input-area { padding: 1rem; border-top: 3px solid var(--text-main); background: #f9f9f9; display: flex; gap: 0.8rem; align-items: center; }
+        #chat-input { flex: 1; border: 2px solid var(--text-main); background: white; padding: 0.5rem; font-family: inherit; font-size: 1rem; outline: none; }
+        #chat-input::placeholder { color: var(--text-muted); }
+        .send-btn { background: var(--text-main); color: white; border: none; width: 45px; height: 45px; cursor: pointer; border: 2px solid var(--text-main); transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .send-btn:hover { background: var(--accent-green); border-color: var(--accent-green); transform: scale(1.05); }
+
+        /* === FOOTER === */
+        #footer { padding: 4rem 2rem; text-align: center; border-top: 3px solid var(--text-main); background: var(--bg-primary); }
+        #footer .logo { font-size: 1.8rem; display: block; margin-bottom: 1rem; }
+        #footer p { color: var(--text-muted); font-size: 0.9rem; }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 900px) {
+            .hero-grid { grid-template-columns: 1fr; text-align: center; gap: 2rem; }
+            .hero-text p { margin: 0 auto; } .hero-buttons { justify-content: center; }
+            .mascot-container { width: 200px; height: 200px; }
+        }
+        @media (max-width: 768px) {
+            .nav-links { display: none; width: 100%; flex-direction: column; background: white; padding: 1rem; position: absolute; top: 70px; left: 0; border-bottom: 3px solid var(--text-main); }
+            .hamburger { display: flex; } .nav-links.active { display: flex; }
+            .hero-text h1 { font-size: 2.8rem; } .message { max-width: 95%; }
+            .search-grid { grid-template-columns: repeat(2, 1fr); }
+            .game-board.memory { grid-template-columns: repeat(3, 60px); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">yoda</a>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#popular-searches">Searches</a></li>
+                <li><a href="#retro-games">Games</a></li>
+                <li><a href="#chat-interface">Chat</a></li>
+            </ul>
+            <div class="hamburger" id="hamburger">
+                <span></span><span></span><span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-grid">
+            <div class="hero-text">
+                <h1>Meet <span>Yoda</span></h1>
+                <p>Your retro, pixel-perfect AI companion. Powered by Llama 3.3 on Groq. Simple, subtle, and uniquely yours.</p>
+                <div class="hero-buttons">
+                    <button class="btn-retro" onclick="document.getElementById('chat-interface').scrollIntoView({behavior:'smooth'})">Start Chatting</button>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="mascot-container">
+                    <!-- IMPORTANT: REPLACE THIS WITH YOUR PIXEL MASCOT -->
+                    <img src="mascot.gif" alt="Yoda Mascot">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Popular Searches Section -->
+    <section id="popular-searches">
+        <div class="container">
+            <div class="section-header">
+                <h2>What's everyone asking Yoda?</h2>
+                <p>Click to instantly populate the chat</p>
+            </div>
+            <div class="search-grid" id="searchGrid">
+                <div class="search-card" data-query="Tell me a fun fact about space"><i class="fa-solid fa-rocket"></i> Space Fun Fact</div>
+                <div class="search-card" data-query="What is the capital of France?"><i class="fa-solid fa-location-dot"></i> Geography</div>
+                <div class="search-card" data-query="Write a short poem about a cat"><i class="fa-solid fa-feather-pointed"></i> Poetry</div>
+                <div class="search-card" data-query="Explain quantum physics simply"><i class="fa-solid fa-atom"></i> Quantum Physics</div>
+                <div class="search-card" data-query="Give me 3 ideas for a startup"><i class="fa-solid fa-lightbulb"></i> Startup Ideas</div>
+                <div class="search-card" data-query="What is the best retro game?"><i class="fa-solid fa-gamepad"></i> Gaming</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Retro Games Section (Fully Functional) -->
+    <section id="retro-games">
+        <div class="container">
+            <div class="section-header">
+                <h2>Retro Arcade Zone</h2>
+                <p>Play some classic pixel games right here!</p>
+            </div>
+            <div class="games-grid">
+                
+                <!-- GAME 1: TIC-TAC-TOE -->
+                <div class="game-card">
+                    <i class="fa-solid fa-border-all" style="font-size: 2rem; color: var(--accent-purple);"></i>
+                    <h3>Tic-Tac-Toe</h3>
+                    <p>Classic X's and O's!</p>
+                    <div class="game-board ttt" id="tttBoard">
+                        <div class="game-cell" data-index="0"></div>
+                        <div class="game-cell" data-index="1"></div>
+                        <div class="game-cell" data-index="2"></div>
+                        <div class="game-cell" data-index="3"></div>
+                        <div class="game-cell" data-index="4"></div>
+                        <div class="game-cell" data-index="5"></div>
+                        <div class="game-cell" data-index="6"></div>
+                        <div class="game-cell" data-index="7"></div>
+                        <div class="game-cell" data-index="8"></div>
+                    </div>
+                    <div id="tttStatus">Player X's turn</div>
+                    <div class="game-controls">
+                        <button class="btn-retro btn-small" onclick="resetTTT()">Reset Game</button>
+                    </div>
+                </div>
+
+                <!-- GAME 2: ROCK PAPER SCISSORS -->
+                <div class="game-card">
+                    <i class="fa-regular fa-hand-rock" style="font-size: 2rem; color: var(--accent-pink);"></i>
+                    <h3>Rock Paper Scissors</h3>
+                    <p>Beat the machine!</p>
+                    <div class="rps-choices">
+                        <button class="rps-btn" onclick="playRPS('rock')">✊</button>
+                        <button class="rps-btn" onclick="playRPS('paper')">✋</button>
+                        <button class="rps-btn" onclick="playRPS('scissors')">✌️</button>
+                    </div>
+                    <div id="rpsResult">Click an icon to start!</div>
+                    <div class="rps-score">
+                        <span>You: <span id="rpsPlayerScore">0</span></span>
+                        <span>Yoda: <span id="rpsAiScore">0</span></span>
+                    </div>
+                </div>
+
+                <!-- GAME 3: MEMORY MATCH -->
+                <div class="game-card">
+                    <i class="fa-solid fa-palette" style="font-size: 2rem; color: var(--accent-green);"></i>
+                    <h3>Memory Match</h3>
+                    <p>Find all the matching pairs!</p>
+                    <div class="game-board memory" id="memoryBoard"></div>
+                    <div id="memoryStatus">Find the pairs!</div>
+                    <div class="game-controls">
+                        <button class="btn-retro btn-small" onclick="resetMemory()">Restart Game</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Chat Interface -->
+    <section id="chat-interface">
+        <div class="container">
+            <div class="chat-wrapper">
+                <div class="chat-header">
+                    <h3><i class="fa-solid fa-robot" style="margin-right: 8px;"></i> Yoda Chat</h3>
+                    <span>ONLINE</span>
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <div class="message">
+                        <div class="bubble">Hello! I am Yoda. Ask me anything, or click a popular search above!</div>
+                    </div>
+                </div>
+                <div class="chat-input-area">
+                    <textarea id="chat-input" rows="1" placeholder="Message Yoda..."></textarea>
+                    <button class="send-btn" id="send-btn"><i class="fa-solid fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="footer">
+        <a href="#" class="logo">yoda</a>
+        <p>Your subtle AI companion. Built with ♥ using Vanilla JS & Groq.</p>
+    </footer>
+
+    <script>
+        /* =========================================================
+           JAVASCRIPT (CHAT + ALL 3 GAMES)
+           ========================================================= */
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- CHAT LOGIC ---
+            const chatInput = document.getElementById('chat-input');
+            const sendBtn = document.getElementById('send-btn');
+            const chatMessages = document.getElementById('chat-messages');
+            const hamburger = document.getElementById('hamburger');
+            const navLinks = document.getElementById('navLinks');
+            const searchCards = document.querySelectorAll('.search-card');
+
+            hamburger.addEventListener('click', () => navLinks.classList.toggle('active'));
+            chatInput.addEventListener('input', () => {
+                chatInput.style.height = 'auto';
+                chatInput.style.height = chatInput.scrollHeight + 'px';
+            });
+
+            function scrollToBottom() { chatMessages.scrollTop = chatMessages.scrollHeight; }
+            function appendMessage(sender, text) {
+                const msgDiv = document.createElement('div');
+                msgDiv.className = `message ${sender === 'user' ? 'user-message' : ''}`;
+                msgDiv.innerHTML = `<div class="bubble">${text}</div>`;
+                chatMessages.appendChild(msgDiv);
+                scrollToBottom();
+            }
+            function showLoader() {
+                const loader = document.createElement('div'); loader.className = 'message'; loader.id = 'thinking-loader';
+                loader.innerHTML = `<div class="bubble">Yoda is thinking...</div>`;
+                chatMessages.appendChild(loader); scrollToBottom();
+            }
+            function removeLoader() {
+                const loader = document.getElementById('thinking-loader');
+                if (loader) loader.remove();
+            }
+
+            async function sendMessage(message) {
+                if (!message) return;
+                appendMessage('user', message);
+                chatInput.value = ''; chatInput.style.height = 'auto';
+                showLoader();
+                try {
+                    const response = await fetch('http://127.0.0.1:5000/chat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: message })
+                    });
+                    removeLoader();
+                    if (!response.ok) throw new Error(`Server error: ${response.status}`);
+                    const data = await response.json();
+                    appendMessage('assistant', data.reply);
+                } catch (error) {
+                    removeLoader();
+                    console.error('Error:', error);
+                    appendMessage('assistant', '⚠️ Connection Error: Make sure your Python backend is running on port 5000.');
+                }
+            }
+
+            sendBtn.addEventListener('click', () => sendMessage(chatInput.value.trim()));
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(chatInput.value.trim()); }
+            });
+
+            searchCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const query = card.getAttribute('data-query');
+                    document.getElementById('chat-interface').scrollIntoView({behavior:'smooth'});
+                    setTimeout(() => sendMessage(query), 500);
+                });
+            });
+
+            // --- GAME 1: TIC-TAC-TOE ---
+            const tttBoard = document.getElementById('tttBoard');
+            const tttStatus = document.getElementById('tttStatus');
+            let tttGameActive = true; let tttCurrentPlayer = 'X'; let tttGameState = ['', '', '', '', '', '', '', '', ''];
+            const tttWinConditions = [[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];
+
+            function handleTTTClick() {
+                const index = parseInt(this.getAttribute('data-index'));
+                if (tttGameState[index] !== '' || !tttGameActive) return;
+                tttGameState[index] = tttCurrentPlayer;
+                this.innerText = tttCurrentPlayer;
+                checkTTTResult();
+            }
+
+            function checkTTTResult() {
+                let roundWon = false;
+                for (let i = 0; i < tttWinConditions.length; i++) {
+                    const [a, b, c] = tttWinConditions[i];
+                    if (tttGameState[a] && tttGameState[a] === tttGameState[b] && tttGameState[a] === tttGameState[c]) {
+                        roundWon = true; break;
+                    }
+                }
+                if (roundWon) { tttStatus.innerText = `Player ${tttCurrentPlayer} Wins!`; tttGameActive = false; return; }
+                if (!tttGameState.includes('')) { tttStatus.innerText = `Game Draw!`; tttGameActive = false; return; }
+                tttCurrentPlayer = tttCurrentPlayer === 'X' ? 'O' : 'X';
+                tttStatus.innerText = `Player ${tttCurrentPlayer}'s turn`;
+            }
+
+            window.resetTTT = function() {
+                tttGameActive = true; tttCurrentPlayer = 'X'; tttGameState = ['', '', '', '', '', '', '', '', ''];
+                tttStatus.innerText = `Player X's turn`;
+                document.querySelectorAll('.ttt .game-cell').forEach(cell => cell.innerText = '');
+            }
+
+            document.querySelectorAll('.ttt .game-cell').forEach(cell => cell.addEventListener('click', handleTTTClick));
+
+            // --- GAME 2: ROCK PAPER SCISSORS ---
+            let rpsPlayerScore = 0; let rpsAiScore = 0;
+            const rpsResult = document.getElementById('rpsResult');
+            const rpsPlayerScoreEl = document.getElementById('rpsPlayerScore');
+            const rpsAiScoreEl = document.getElementById('rpsAiScore');
+
+            window.playRPS = function(playerChoice) {
+                const choices = ['rock', 'paper', 'scissors'];
+                const aiChoice = choices[Math.floor(Math.random() * 3)];
+                const emojis = {'rock':'✊','paper':'✋','scissors':'✌️'};
+                
+                let resultMsg = `Yoda chose ${emojis[aiChoice]}. `;
+                if (playerChoice === aiChoice) { resultMsg += "It's a Draw!"; }
+                else if (
+                    (playerChoice === 'rock' && aiChoice === 'scissors') ||
+                    (playerChoice === 'paper' && aiChoice === 'rock') ||
+                    (playerChoice === 'scissors' && aiChoice === 'paper')
+                ) { resultMsg += "You Win!"; rpsPlayerScore++; }
+                else { resultMsg += "Yoda Wins!"; rpsAiScore++; }
+                
+                rpsResult.innerText = resultMsg;
+                rpsPlayerScoreEl.innerText = rpsPlayerScore;
+                rpsAiScoreEl.innerText = rpsAiScore;
+            }
+
+            // --- GAME 3: MEMORY MATCH ---
+            const memoryBoard = document.getElementById('memoryBoard');
+            const memoryStatus = document.getElementById('memoryStatus');
+            let memoryCards = []; let memoryFlipped = false; let memoryLockBoard = false;
+            let memoryFirstCard, memorySecondCard; let memoryMatches = 0;
+
+            const memoryEmojis = ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼'];
+            const memoryDeck = [...memoryEmojis, ...memoryEmojis];
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+                return array;
+            }
+
+            function initMemoryGame() {
+                memoryBoard.innerHTML = '';
+                memoryMatches = 0; memoryLockBoard = false; memoryFlipped = false;
+                memoryCards = shuffleArray([...memoryDeck]);
+                memoryCards.forEach((emoji, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'game-cell memory-card';
+                    card.dataset.emoji = emoji;
+                    card.dataset.index = index;
+                    card.innerText = '?';
+                    card.addEventListener('click', flipMemoryCard);
+                    memoryBoard.appendChild(card);
+                });
+                memoryStatus.innerText = `Find the pairs! (${memoryMatches}/${memoryEmojis.length})`;
+            }
+
+            function flipMemoryCard() {
+                if (memoryLockBoard) return;
+                if (this === memoryFirstCard) return;
+                if (this.classList.contains('matched')) return;
+
+                this.innerText = this.dataset.emoji;
+                this.style.background = '#fcfcfc'; this.style.color = 'black';
+
+                if (!memoryFlipped) {
+                    memoryFlipped = true; memoryFirstCard = this; return;
+                }
+                
+                memorySecondCard = this;
+                checkMemoryMatch();
+            }
+
+            function checkMemoryMatch() {
+                const isMatch = memoryFirstCard.dataset.emoji === memorySecondCard.dataset.emoji;
+                isMatch ? disableMemoryCards() : unflipMemoryCards();
+            }
+
+            function disableMemoryCards() {
+                memoryFirstCard.classList.add('matched'); memorySecondCard.classList.add('matched');
+                memoryMatches++;
+                memoryStatus.innerText = `Find the pairs! (${memoryMatches}/${memoryEmojis.length})`;
+                if(memoryMatches === memoryEmojis.length) memoryStatus.innerText = "🎉 You found all pairs!";
+                resetMemoryBoard();
+            }
+
+            function unflipMemoryCards() {
+                memoryLockBoard = true;
+                setTimeout(() => {
+                    memoryFirstCard.innerText = '?'; memoryFirstCard.style.background = 'var(--accent-pink)'; memoryFirstCard.style.color = 'white';
+                    memorySecondCard.innerText = '?'; memorySecondCard.style.background = 'var(--accent-pink)'; memorySecondCard.style.color = 'white';
+                    resetMemoryBoard();
+                }, 1000);
+            }
+
+            function resetMemoryBoard() {
+                [memoryFlipped, memoryLockBoard] = [false, false];
+                [memoryFirstCard, memorySecondCard] = [null, null];
+            }
+
+            window.resetMemory = function() { initMemoryGame(); }
+            initMemoryGame();
+        });
+    </script>
+</body>
+</html>
